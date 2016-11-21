@@ -20,7 +20,9 @@ Creates a thumbnail. Return image raw.
 | mobile  | String     | Return the full page and not only the part above the fold. An endless page can result in a very large image. E.g. `true` mobile (Premium only). 
 | refresh | String     | Deliver a fresh screenshot even if a cached version is available. E.g. `true`
 
-```Usage example:
+### Usage example:
+
+```php
 $response = $rapid->call(
 	'ThumbnailWs', 
 	'createThumbnail', 
