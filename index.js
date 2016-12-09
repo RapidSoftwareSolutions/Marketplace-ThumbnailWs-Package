@@ -1,33 +1,20 @@
 'use strict';
 global.PACKAGE_NAME = "ThumbnailWs";
 
-global.ValidationError = function(fields) {
-    this.text   = 'Please, check and fill in required fields';
-    this.fields = fields || [];
-}
-
-ValidationError.prototype = Object.create(Error.prototype);
-ValidationError.prototype.constructor = ValidationError;
-
+const fs            = require('fs');
+const Promise       = require('bluebird');
 const express       = require('express');
 const bodyParser    = require('body-parser');
-const API           = require('rapi-js-package');
 const lib           = require('./lib/functions.js');
-const _             = lib.callback;
+const _request      = require('request');
+const _             = Promise.coroutine;
 
 const PORT          = process.env.PORT || 8080;
 const app           = express();
 
-const argMap = {
-    "credentials|apiKey": "$!apiKey",
-    "String|url":         "$url",
-    "String|width":       "$width",
-    "Number|delay":       "delay",
-    "Bool|fullpage":      "fullpage",
-    "Bool|mobile":        "mobile",
-    "String|format":      "format",
-    "Bool|refresh":       "refresh"
-}
+const tempFolder    = 'rapid_responses_temp';
+const ERR_REQ       = 'REQUIRED_FIELDS';
+const ERR_JSON      = 'JSON_VALIDATION';
 
 app.use(bodyParser.json(({limit: '50mb'})));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
@@ -39,37 +26,72 @@ app.post(`/api/${PACKAGE_NAME}/createThumbnail`, _(function* (req, res) {
         contextWrites: {}
     };
 
-    let response,
-        key     = req.body.args.apiKey,
-        options = {},
-        opts    = {};
+    let {
+        url,
+        width,
+        delay,
+        apiKey,
+        mobile,
+        refresh,
+        fullpage,
+    } = lib.clearArgs(req.body.args);
 
     try {
-        for(let arg in argMap) {
-            let argarr      = arg.split('|');
-            opts[argMap[arg] + '|' + argarr[0]] = req.body.args[argarr[1]];
+        let requireds = lib.parseReq({ apiKey, url, width });
+
+        if(requireds.length > 0) {
+            throw {
+                status_code: 'REQUIRED_FIELDS',
+                status_msg:  'Please, check and fill in required fields.',
+                fields:       requireds
+            };
         }
 
-        options.method    = 'POST';
-        options.query     = opts;
-        //options.debug     = true;
-
-        response              = yield new API(`https://api.thumbnail.ws/api/${key}/thumbnail/get`).request(options);
+        let response          = yield request(apiKey, {url, width, mobile, refresh, fullpage});
         r.callback            = 'success';
         r.contextWrites['to'] = {
             status: 'success',
-            base64: new Buffer(response, 'binary').toString('base64')
-        };
+            //url: todo 
+            base64: response,
+        }
     } catch(e) {
         r.callback            = 'error';
-        r.contextWrites['to'] = e.status_code ? e : {
+        r.contextWrites['to'] = {
             status_code: 'API_ERROR',
-            status_msg:  e.message ? e.message : e
+            status_msg: e
         };
     }
 
     res.status(200).send(r);
 }));
+
+function request(key, options) { 
+    let name = lib.randomString();
+
+    return new Promise((resolve, reject) => {
+        let thumbStream = _request({
+            qs:     options,
+            uri:    `https://api.thumbnail.ws/api/${key}/thumbnail/get`,
+            method: 'GET'
+        }, (err, resp, body) => {
+            if(err || resp.statusCode !== 200) reject({
+                status_code: 'API_ERROR',
+                status_msg:  body || err,
+            });
+        }).pipe(fs.createWriteStream(name));
+
+        thumbStream.on('finish', () => {
+            let image = fs.readFileSync(name);
+            resolve(image.toString('base64'));
+
+            fs.unlink(name, () => {});
+        });
+
+        thumbStream.on('error', function(err) {
+            reject(err);
+        })
+    });
+}
 
 app.listen(PORT);
 module.exports = app;
