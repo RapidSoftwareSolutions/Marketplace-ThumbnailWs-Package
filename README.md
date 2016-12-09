@@ -6,7 +6,6 @@ Looking for a reliable web service to create thumbnails from websites? Take a lo
 ## How to get credentials: 
 Just fill in [Sign Up Form](https://thumbnail.ws/sign-up.html).
  
-<a name="createThumbnail"/>
 ## ThumbnailWs.createThumbnail
 Creates a thumbnail. Return image raw.
 
@@ -22,18 +21,24 @@ Creates a thumbnail. Return image raw.
 
 ### Usage example:
 
-```php
-$response = $rapid->call(
-	'ThumbnailWs', 
-	'createThumbnail', 
-	[
-		'apiKey' => '###',
-		'url'    => 'http://rapidapi.com',
-		'width'  => 400 
-	]
-);
+```javascript
+const RapidAPI = require('rapidapi-connect');
+const rapid = new RapidAPI('...', '...');
+const fs = new RapidAPI('fs');
 
-header("Content-type: image/jpg");
-echo $response;
-exit(0);
+rapid.call('ThumbnailWs', 'createThumbnail', { 
+	'apiKey': '...',
+	'url':    'https://rapidapi.com',
+	'width':  960 
+}).on('success', (result) => {
+	let base64 = new Buffer(result.base64, 'base64');
+
+	fs.writeFile('rapid_screenshot.jpg', base64.toString(), { flag: 'wx' }, function (err) {
+	    if (err) throw err;
+
+	    console.log('Success!')
+	});
+}).on('error', (err) => {
+	throw err;
+});
 ```

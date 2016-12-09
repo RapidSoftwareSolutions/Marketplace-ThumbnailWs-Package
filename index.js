@@ -56,11 +56,14 @@ app.post(`/api/${PACKAGE_NAME}/createThumbnail`, _(function* (req, res) {
 
         response              = yield new API(`https://api.thumbnail.ws/api/${key}/thumbnail/get`).request(options);
         r.callback            = 'success';
-        r.contextWrites['to'] = response;
+        r.contextWrites['to'] = {
+            status: 'success',
+            base64: new Buffer(response, 'binary').toString('base64')
+        };
     } catch(e) {
         r.callback            = 'error';
         r.contextWrites['to'] = e.status_code ? e : {
-            status_code: "API_ERROR",
+            status_code: 'API_ERROR',
             status_msg:  e.message ? e.message : e
         };
     }
