@@ -22,23 +22,21 @@ Creates a thumbnail. Return image raw.
 ### Usage example:
 
 ```javascript
+const fs       = require('fs');
 const RapidAPI = require('rapidapi-connect');
-const rapid = new RapidAPI('...', '...');
-const fs = new RapidAPI('fs');
+const rapid    = new RapidAPI("Yo", "bea5ff69-5748-43dc-bf04-05ffc3842e3c");
 
 rapid.call('ThumbnailWs', 'createThumbnail', { 
-	'apiKey': '...',
-	'url':    'https://rapidapi.com',
-	'width':  960 
+    'apiKey': 'abefacabbcd43c76555e37ad5b923fd6c771ca336b21',
+    'url':    'https://rapidapi.com',
+    'width':  960
 }).on('success', (result) => {
-	let base64 = new Buffer(result.base64, 'base64');
+    fs.writeFile('rapid_screenshot.png', result.base64, 'base64', function (err) {
+        if (err) throw err;
 
-	fs.writeFile('rapid_screenshot.jpg', base64.toString(), { flag: 'wx' }, function (err) {
-	    if (err) throw err;
-
-	    console.log('Success!')
-	});
+        console.log('Success!')
+    });
 }).on('error', (err) => {
-	throw err;
+    throw err;
 });
 ```
