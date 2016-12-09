@@ -24,10 +24,10 @@ Creates a thumbnail. Return image raw.
 ```javascript
 const fs       = require('fs');
 const RapidAPI = require('rapidapi-connect');
-const rapid    = new RapidAPI("Yo", "bea5ff69-5748-43dc-bf04-05ffc3842e3c");
+const rapid    = new RapidAPI("...", "...");
 
 rapid.call('ThumbnailWs', 'createThumbnail', { 
-    'apiKey': 'abefacabbcd43c76555e37ad5b923fd6c771ca336b21',
+    'apiKey': '...',
     'url':    'https://rapidapi.com',
     'width':  960
 }).on('success', (result) => {
