@@ -34,7 +34,7 @@ rapid.call('ThumbnailWs', 'createThumbnail', {
     fs.writeFile('rapid_screenshot.png', result.base64, 'base64', function (err) {
         if (err) throw err;
 
-        console.log('Success!')
+        console.log('Success!');
     });
 }).on('error', (err) => {
     throw err;

@@ -53,6 +53,7 @@ app.post(`/api/${PACKAGE_NAME}/createThumbnail`, _(function* (req, res) {
             status: 'success',
             //url: todo 
             base64: response,
+            url: `<a href="data:audio/ogg;base64,${response}" target="_blank">Download screenshot of ${url}</a>`
         }
     } catch(e) {
         r.callback            = 'error';
