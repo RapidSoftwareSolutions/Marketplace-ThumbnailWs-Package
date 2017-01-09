@@ -51,7 +51,7 @@ app.post(`/api/${PACKAGE_NAME}/createThumbnail`, _(function* (req, res) {
         r.callback            = 'success';
         r.contextWrites['to'] = {
             status: 'success',
-            url: `<a href="data:image/jpeg;base64,${response}" target="_blank">Download screenshot of ${url}</a>`,
+            url: `http://download.rapidapi.com/?format=data:image/jpeg&data=${response}`,
             base64: response
         }
     } catch(e) {
