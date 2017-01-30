@@ -49,11 +49,7 @@ app.post(`/api/${PACKAGE_NAME}/createThumbnail`, _(function* (req, res) {
 
         let response          = yield request(apiKey, {url, width, mobile, refresh, fullpage});
         r.callback            = 'success';
-        r.contextWrites['to'] = {
-            status: 'success',
-            //url: `http://data:image/jpeg;base64,${response}`,
-            base64: response
-        }
+        r.contextWrites['to'] = response;
     } catch(e) {
         r.callback            = 'error';
         r.contextWrites['to'] = {
@@ -66,7 +62,8 @@ app.post(`/api/${PACKAGE_NAME}/createThumbnail`, _(function* (req, res) {
 }));
 
 function request(key, options) { 
-    let name = lib.randomString();
+    let name   = lib.randomString();
+    let length = 0;
 
     return new Promise((resolve, reject) => {
         let thumbStream = _request({
@@ -74,6 +71,8 @@ function request(key, options) {
             uri:    `https://api.thumbnail.ws/api/${key}/thumbnail/get`,
             method: 'GET'
         }, (err, resp, body) => {
+            length = resp.headers['content-length'];
+
             if(err || resp.statusCode !== 200) reject({
                 status_code: 'API_ERROR',
                 status_msg:  body || err,
@@ -82,7 +81,21 @@ function request(key, options) {
 
         thumbStream.on('finish', () => {
             let image = fs.readFileSync(name);
-            resolve(image.toString('base64'));
+
+            let r = _request({
+                method: 'POST',
+                uri: 'http://104.198.149.144:8080'
+            }, (err, resp, body) => {
+                if (err) reject(err || JSON.parse(body));
+
+                resolve(JSON.parse(body));
+            })
+            .form()
+            r.append('file', image, {
+                filename: options.url + '.jpg',
+                contentType: 'image/jpg' 
+            })
+            r.append('length', length);
 
             fs.unlink(name, () => {});
         });
