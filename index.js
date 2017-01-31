@@ -63,7 +63,6 @@ app.post(`/api/${PACKAGE_NAME}/createThumbnail`, _(function* (req, res) {
 
 function request(key, options) { 
     let name   = lib.randomString();
-    let length = 0;
 
     return new Promise((resolve, reject) => {
         let thumbStream = _request({
@@ -71,8 +70,6 @@ function request(key, options) {
             uri:    `https://api.thumbnail.ws/api/${key}/thumbnail/get`,
             method: 'GET'
         }, (err, resp, body) => {
-            length = resp.headers['content-length'];
-
             if(err || resp.statusCode !== 200) reject({
                 status_code: 'API_ERROR',
                 status_msg:  body || err,
@@ -91,11 +88,12 @@ function request(key, options) {
                 resolve(JSON.parse(body));
             })
             .form()
+            
             r.append('file', image, {
                 filename: options.url + '.jpg',
                 contentType: 'image/jpg' 
             })
-            r.append('length', length);
+            r.append('length', image.length);
 
             fs.unlink(name, () => {});
         });
