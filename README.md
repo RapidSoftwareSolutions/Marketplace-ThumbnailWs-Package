@@ -1,3 +1,5 @@
+[![](https://scdn.rapidapi.com/RapidAPI_banner.png)](https://rapidapi.com/package/ThumbnailWs/functions?utm_source=RapidAPIGitHub_ThumbnailCustomFunctions&utm_medium=button&utm_content=RapidAPI_GitHub)
+
 # ThumbnailWs Package
 Looking for a reliable web service to create thumbnails from websites? Take a look at the result on the left and enter your own url to see the result. 
 * Domain: https://thumbnail.ws
