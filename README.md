@@ -6,7 +6,7 @@ Looking for a reliable web service to create thumbnails from websites? Take a lo
 * Credentials: apiKey
 
 ## How to get credentials: 
-Just fill in [Sign Up Form](https://thumbnail.ws/sign-up.html).
+1. Fill out this [sign up form](https://thumbnail.ws/sign-up.html) to get an API key emailed to you
  
 ## ThumbnailWs.createThumbnail
 Creates a thumbnail. Return image raw.
