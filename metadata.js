@@ -10,6 +10,9 @@ res.status(200).send({
     "domain": "thumbnail.ws",
     "credentials": ['apiKey']
   },
+  "steps": [
+    "Fill out this sign up form (https://thumbnail.ws/sign-up.html) to get an API key emailed to you"
+  ],
   "blocks": [
     {
       "name": "createThumbnail",
